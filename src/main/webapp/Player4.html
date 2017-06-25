@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<!-- saved from url=(0059)https://threejs.org/examples/misc_controls_pointerlock.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			html, body {
+				width: 100%;
+				height: 100%;
+			}
+
+			body {
+				background-color: #ffffff;
+				margin: 0;
+				overflow: hidden;
+				font-family: arial;
+			}
+
+
+		</style>
+	<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+	<script src="NetConnection/Connection.js" ></script>
+	
+		<script src="https://js.pusher.com/4.0/pusher.min.js"></script>
+	    <link rel="stylesheet" type="text/css" href="main.css">
+
+	<title>Player4</title>
+	</head>
+	<body>
+		<script type="text/javascript" src="lib/three.min.js" ></script>
+    <script src="lib/Detector.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		<script type="text/javascript" src="lib/MTLLoader.js" ></script>
+		<script type="text/javascript" src="lib/OBJLoader.js" ></script>
+		<script src="js/bomb.js"></script>
+		<script src="js/Player.js"></script>
+		<script src="js/Crate.js"></script>
+		<script src="js/Rock.js"></script>
+		<script src="js/Map.js"></script>
+		<script src="js/BombFire.js"></script>
+		<script src="js/tool.js"></script>
+		<script src="lib/Fire.js"></script>
+		<script src="lib/FireShader.js"></script>
+		    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="https://js.pusher.com/4.0/pusher.min.js"></script>
+    <script src = "test1.js"></script>
+		<script>
+			var collidableObjects=[];//player會撞到的物件
+			var rockObjects=[];//不能破壞的東西的物件
+			var CrateObjects=[];//可以破壞的道具的物件
+			var rockMesh=[];//不能破壞的東西的Mesh
+			var CrateMesh=[];//可以破壞的道具的Mesh
+			var toolFirstMesh=[];//第一種道具
+			var toolSecondMesh=[];//第二種道具
+			var PLAYERCOLLISIONDISTANCE = 1;//玩家離多遠算撞牆
+			var UNITWIDTH=5;//一個格子的寬度
+			var mapSize=0;//地圖大小
+			var totalCubesWide=0;//cube數量
+			var camera, scene, renderer;//鏡頭,場景,渲染器
+			var players=[];
+			var playersMesh=[];
+			var models = {
+          bomb:{
+            obj:"models/bomb.obj",
+            mtl:"models/bomb.mtl",
+            mesh:null
+          }
+					, tool:{
+						power:{
+							obj:"models/tool/power/dinamite.obj" ,
+							mtl:"models/tool/power/dinamite.mtl" ,
+							mesh:null
+						}
+						, speed:{
+							obj:"models/tool/speed/shoe.obj" ,
+							mtl:"models/tool/speed/shoe.mtl" ,
+							mesh:null
+						}
+					}
+				}
+			init();
+			function init() {
+						if ( ! Detector.webgl ) Detector.addGetWebGLMessage();//如果沒GL就載入
+						camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 500 );
+						scene = new THREE.Scene();//場景
+						renderer = new THREE.WebGLRenderer({antialias: true});//渲染器
+						renderer.setSize( window.innerWidth, window.innerHeight );//渲染範圍
+						document.body.appendChild( renderer.domElement );
+						clock = new THREE.Clock();//時脈
+						camera.position.set(0,50, 0);
+						camera.lookAt(new THREE.Vector3(0,0,0));
+						var light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.75 );
+						light.position.set( 0.5, 1, 0.75 );
+						scene.add( light );
+
+		        var mtlLoader = new THREE.MTLLoader();
+						//載入炸彈模型
+		        mtlLoader.load(models.bomb.mtl, function(materials){
+             	materials.preload();
+             	var objLoader = new THREE.OBJLoader();
+             	objLoader.setMaterials(materials);
+             	objLoader.load(models.bomb.obj, function(mesh){
+              	models.bomb.mesh = mesh;
+	            });
+						});
+
+						//載入增加火力道具
+						new THREE.MTLLoader().load(models.tool.power.mtl, function(materials){
+						 	//materials.preload();
+						 	var objLoader = new THREE.OBJLoader();
+						 	objLoader.setMaterials(materials);
+						 	objLoader.load(models.tool.power.obj, function(mesh){
+								models.tool.power.mesh = mesh;
+							});
+						});
+
+						//載入增加速度道具
+						new THREE.MTLLoader().load(models.tool.speed.mtl, function(materials){
+							materials.preload();
+							var objLoader = new THREE.OBJLoader();
+							objLoader.setMaterials(materials);
+							objLoader.load(models.tool.speed.obj, function(mesh){
+
+								models.tool.speed.mesh = mesh;
+							});
+						});
+
+						var loader = new THREE.JSONLoader();//載入玩家模型
+						loader.load( "models/parrot.json", function( geometry ) {
+							var material = new THREE.MeshPhongMaterial( {
+								color: 0xffffff,
+								morphTargets: true,
+								vertexColors: THREE.FaceColors,
+								shading: THREE.FlatShading
+							} );
+							//var temp = ;
+							for(var i=0;i<4;i++){
+							players.push(new Player(new THREE.Mesh( geometry, material ),i));
+							playersMesh.push(players[i].mesh);
+							if(i==0)players[i].mesh.position.set(2.5,2.5,2.5);
+							else if(i==1)players[i].mesh.position.set(17.5,2.5,2.5);
+							else if(i==2)players[i].mesh.position.set(17.5,2.5,17.5);
+							else if(i==3)players[i].mesh.position.set(2.5,2.5,17.5);
+							scene.add( players[i].mesh);
+						}
+							callback();
+						} );
+    }
+	
+    function callback()
+        {
+						createMap();//建立地圖
+						wallLoad();//載入牆壁
+						floorLoad();//載入地板
+						drawSimpleSkybox();//載入天空
+						animate();
+        }
+			function wallLoad(){
+				var wallGeometry=new THREE.PlaneGeometry( 100, 15, 50, 50 );
+				var wallTexture = new THREE.ImageUtils.loadTexture( 'texture/wall.jpg' );
+				wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping;
+				wallTexture.repeat.set( 50, 10 );
+				var wallMaterial = new THREE.MeshPhongMaterial( { map: wallTexture, side: THREE.DoubleSide } );
+			  var wall=new THREE.Mesh( wallGeometry, wallMaterial );
+				wall.alive=true;
+				wall.rotateY( - Math.PI / 2 );
+				wall.position.set(mapSize,0,mapSize/2);
+				var wall2=new THREE.Mesh( wallGeometry, wallMaterial );
+				wall2.alive=true;
+				wall2.rotateY( + Math.PI / 2 );
+				wall2.position.set(0,0,mapSize/2);
+				var wall3=new THREE.Mesh( wallGeometry, wallMaterial );
+				wall3.alive=true;
+				wall3.position.set(mapSize/2,0,0);
+				var wall4=new THREE.Mesh( wallGeometry, wallMaterial );
+				wall4.alive=true;
+				wall4.position.set(mapSize/2,0,mapSize);
+				scene.add(wall);
+				scene.add(wall2);
+				scene.add(wall3);
+				scene.add(wall4);
+				collidableObjects.push(wall);
+				collidableObjects.push(wall2);
+				collidableObjects.push(wall3);
+				collidableObjects.push(wall4);
+				rockMesh.push(wall);
+				rockMesh.push(wall2);
+				rockMesh.push(wall3);
+				rockMesh.push(wall4);
+			}
+			function onWindowResize() {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+			}
+			function floorLoad(){
+				var floorTexture = new THREE.ImageUtils.loadTexture( 'texture/floor.jpg' );
+				floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
+				floorTexture.repeat.set( 70, 70 );
+				var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
+				var floorGeometry = new THREE.PlaneGeometry(mapSize, mapSize, 10, 10);
+				var floor = new THREE.Mesh(floorGeometry, floorMaterial);
+				floor.position.set(mapSize/2,0,mapSize/2);
+				floor.rotation.x = Math.PI / 2;
+				scene.add(floor);
+		}
+			function drawSimpleSkybox() {
+			var path = 'skybox/';
+			var sides = [ path + 'sbox_px.jpg', path + 'sbox_nx.jpg', path + 'sbox_py.jpg', path + 'sbox_ny.jpg', path + 'sbox_pz.jpg', path + 'sbox_nz.jpg' ];
+			var scCube = THREE.ImageUtils.loadTextureCube(sides);
+			var skyShader = THREE.ShaderLib["cube"];
+			skyShader.uniforms["tCube"].value = scCube;
+			var skyMaterial = new THREE.ShaderMaterial( {
+			fragmentShader: skyShader.fragmentShader, vertexShader: skyShader.vertexShader,
+			uniforms: skyShader.uniforms, depthWrite: false, side: THREE.BackSide
+			});
+			skyBox = new THREE.Mesh(new THREE.CubeGeometry(300, 300, 300), skyMaterial);
+			this.scene.add(skyBox);
+			}
+
+			function moveControl(){
+				
+                if(players[3].move.down == true){ // S key
+     			//function connect(actionIn,positionIn,rotationIn,putBomb,encounterItem)
+                	//players[3].mesh.rotation.y = 0;
+					if(!players[3].detectPlayerCollision()){
+					     playerMove("MoveDown",Math.cos(0) * 0.3,0);
+						 //connect("MoveDown",Math.cos(0) * 0.3,0,null,null);
+					}
+
+                }
+                if(players[3].move.up == true){ // W key
+                  	
+                	//players[3].mesh.rotation.y = Math.PI;
+					if(!players[3].detectPlayerCollision()){
+						   playerMove("MoveUp",Math.cos(Math.PI) * 0.3,Math.PI);
+						// connect("MoveUp",Math.cos(Math.PI) * 0.3,Math.PI,null,null);
+					}
+
+                }
+                if(players[3].move.right == true){ // D key
+                	//players[3].mesh.rotation.y = Math.PI/2;
+						if(!players[3].detectPlayerCollision()){
+							//connect("MoveRight",Math.sin(Math.PI/2) * 0.3,Math.PI/2,null,null);
+						playerMove("MoveRight",Math.sin(Math.PI/2) * 0.3,Math.PI/2);
+						}
+                   
+                }
+                if(players[3].move.left == true){ // A key
+                 // 	players[3].mesh.rotation.y = Math.PI*3/2
+					if(!players[3].detectPlayerCollision()){
+						  playerMove("MoveLeft",Math.sin(Math.PI*3/2) * 0.3,Math.PI*3/2);
+						//connect("MoveLeft",Math.sin(Math.PI*3/2) * 0.3,Math.PI*3/2,null,null);								
+					}
+               }
+
+                if(players[3].move.atk){
+                	players[3].Attack();
+                }
+                try{
+                camera.position.z=players[3].mesh.position.z + 50;
+                //camera.position.y=player.position.y=100;
+                camera.position.x=players[3].mesh.position.x;
+                camera.lookAt(new THREE.Vector3(players[3].mesh.position.x,5,players[3].mesh.position.z));
+                }catch(e){}
+
+			}
+            
+
+			var	 interval = setInterval(takeCareOfYourNamePoPo,100);
+			var updateBool=false;
+			function takeCareOfYourNamePoPo(){updateBool=true;}
+
+			function animate() {
+				for(var i=0;i<players.length;i++)
+				players[i].update();
+				requestAnimationFrame( animate );
+				var time = Date.now() * 0.0005;
+				var delta = clock.getDelta();
+				collidableObjectsCheck();//Map.js 裡面
+				bombsCheck();
+				//firesCheck();
+				bombFiresCheck();
+				moveControl();
+        //if(mixer)mixer.update( delta );
+				for (var i = 0; i < BombFires.length; i++) {
+					for(var j=0;j < BombFires[i].fires.length;j++)
+						BombFires[i].fires[j].update(0);  //clock.elapsedTime
+				}
+				//refresh();
+				if(updateBool){
+				//更新資料
+					springRefresh();
+					updateBool=false;
+				}
+				//bombRefresh();
+				renderer.render( scene, camera );
+
+			}
+
+			function keyDown(event){
+				switch (event.keyCode) {
+		      case 38: // up
+		      case 87: // w
+		        players[3].move.up = true;
+						players[3].move.left = false;
+						players[3].move.down = false;
+						players[3].move.right = false;
+		        break;
+
+		      case 37: // left
+		      case 65: // a
+		         players[3].move.left = true;
+						 players[3].move.up = false;
+						 players[3].move.down = false;
+						 players[3].move.right = false;
+		        break;
+
+		      case 40: // down
+		      case 83: // s
+		         players[3].move.down = true;
+						 players[3].move.left = false;
+						 players[3].move.up = false;
+						 players[3].move.right = false;
+		        break;
+
+		      case 39: // right
+		      case 68: // d
+		         players[3].move.right = true;
+						 players[3].move.left = false;
+						 players[3].move.down = false;
+						 players[3].move.up = false;
+		        break;
+
+					case 32: // space
+						//alert(fires.length);
+						players[3].move.atk = true;
+						break;
+    			}
+			}
+
+			function keyUp(event){
+				switch (event.keyCode) {
+		      case 38: // up
+		      case 87: // w
+		        players[3].move.up = false;
+		        break;
+
+		      case 37: // left
+		      case 65: // a
+		         players[3].move.left = false;
+		        break;
+
+		      case 40: // down
+		      case 83: // s
+		         players[3].move.down = false;
+		        break;
+
+		      case 39: // right
+		      case 68: // d
+		         players[3].move.right = false;
+		        break;
+
+    			}
+			}
+
+
+			window.addEventListener('keydown', keyDown);
+			window.addEventListener('keyup', keyUp);
+			window.addEventListener( 'resize', onWindowResize, false );
+		</script>
+<audio id="speedUp" style="display:none" >
+<source src="sounds/SoundsForGame/SpeedUp.mp3" type='audio/mp3'>
+</audio>
+<audio id="fireUp" style="display:none" >
+<source src="sounds/SoundsForGame/FireUp.mp3" type='audio/mp3'>
+</audio>
+<audio id="soundtrack" loop autoplay style="display:none">
+		<source src="sounds/Shooting-Stars.mp3" type='audio/mp3'>
+</audio>
+    <div id="gameAreaWrapper" style="opacity: 1;">
+		<div class="chatbox" id="chatbox" style="display: block;">
+			<ul id="chatList" class="chat-list" style="pointer-events: none;">
+            </ul>
+			<div>
+				<input id="chatInput" type="text" class="chat-input" placeholder="Send Message..." maxlength="50">
+			</div>
+		</div>
+		<canvas tabindex="1" id="cvs" class="noRightClick" oncontextmenu="return false;" width="998" height="736"></canvas>
+	</div>
+</body></html>

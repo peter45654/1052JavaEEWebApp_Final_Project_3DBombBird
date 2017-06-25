@@ -1,0 +1,101 @@
+
+.chatbox {
+	position: absolute;
+	bottom: 15px;
+	left: 10px;
+	pointer-events: none;
+}
+
+ul {
+	list-style-type: none;
+}
+
+ul.tab {
+	width: 100%;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+ul.tab li {
+	display: table-cell;
+}
+.chatbox  li {
+	padding: 2px;
+	margin: 3px;
+	word-wrap: break-word;
+}
+
+.chatbox .chat-list{
+	padding-left: 0px;
+}
+
+.chatbox .chat-list li.me span {
+	color: #000;
+}
+
+.chatbox .chat-list li.red span {
+	color: red;
+}
+
+.chatbox .chat-list li.blue span {
+	color: #5151d9;
+}
+
+.chatbox .chat-list li.system span {
+	color: #db4fcd;
+}
+
+.chatbox .chat-list li.notif span {
+	color: #fff;
+}
+
+.chatbox .chat-input {
+	position: relative;
+	pointer-events: auto;
+	width: 250px;
+	padding: 8px;
+	color: #000;
+	border: none;
+	font-size: 14px;
+	background: rgba(0, 0, 0, 0.2);
+	display: inline-block;
+}
+
+#chatType {
+	display: inline-block;
+	font-size: 14px;
+	pointer-events: auto;
+	margin-left: 5px;
+	background: rgba(0, 0, 0, 0.2);
+	padding: 8px;
+	color: #fff;
+	cursor: pointer;
+}
+
+canvas {
+	width: 100% !important;
+	height: 100% !important;
+	margin: 0;
+	padding: 0;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	outline: none;
+	-webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+	image-rendering: -moz-crisp-edges;
+	image-rendering: -webkit-crisp-edges;
+	-ms-interpolation-mode: nearest-neighbor;
+	image-rendering: pixelated;
+	image-rendering: optimizeSpeed;  
+}
+
+
+@font-face {
+	font-family: 'mainFont';
+	font-size: 8px;
+	src: url("font2.ttf");
+}

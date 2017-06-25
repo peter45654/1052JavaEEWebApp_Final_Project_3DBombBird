@@ -1,0 +1,105 @@
+
+body{
+
+    background: url("menu_background_img.png");
+    overflow-x: auto;
+    overflow-y: auto;
+}
+img{
+	position:absolute;
+}
+.player
+{
+  text-align: center;
+
+  min-width: 1400px;
+}
+
+.showplayer
+{
+  overflow:scroll;
+  text-align: center;
+}
+.buttons
+{
+  margin:0px auto;
+}
+button
+{
+  border: none;
+}
+button:hover {
+  opacity: 0.8;
+  box-shadow: 0 20px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+button:active {
+  opacity: 0.5;
+  transform: translateY(4px);
+}
+.Start_but
+{
+  margin: 0px 5px;
+  background-image:url(Start.png);
+  width: 300px;
+  height: 100px;
+}
+.Ready_but
+{
+  margin: 0px 5px;
+  background-image:url(Ready.png);
+  width: 300px;
+  height: 100px;
+}
+.Cancel_but
+{
+  margin: 0px 5px;
+  background-image:url(Cancel.png);
+  width: 300px;
+  height: 100px;
+}
+#style-15::-webkit-scrollbar-track
+{
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.1);
+	background-color: #F5F5F5;
+	border-radius: 10px;
+}
+
+#style-15::-webkit-scrollbar
+{
+	width: 10px;
+	background-color: #F5F5F5;
+}
+
+#style-15::-webkit-scrollbar-thumb
+{
+	border-radius: 10px;
+	background-color: #FFF;
+	background-image: -webkit-gradient(linear,
+									   40% 0%,
+									   75% 84%,
+									   from(#4D9C41),
+									   to(#19911D),
+									   color-stop(.6,#54DE5D))
+}
+.ShowHint
+{
+  border:none;
+  position:fixed;
+  bottom: 0;
+  right: 0;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+}
+.ShowHint:hover
+{
+  background-color:white;
+}
+.Salert
+{
+  font-family: Microsoft Jhenghei;
+}
+	
+.background{
+	position:absolute; min-height: 100%; min-width:100%; text-align: center;background-color:#FFFFFF;
+}

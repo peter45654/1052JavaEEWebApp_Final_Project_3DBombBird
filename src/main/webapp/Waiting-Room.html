@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head prefix="og: http://ogp.me/ns#">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="Waiting-Room.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" type="text/css" href="sweetalert/dist/sweetalert.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		<script src="https://js.pusher.com/4.0/pusher.min.js"></script>
+		<title>LAMO</title>
+
+</head>
+
+<body id="style-15" onload="SetUp()">
+<div id="background" class="background">
+		<img src="welcome.gif" id="title" class="w3-padding w3-display-middle"><br>
+		
+  </div>
+	<audio id="buttonClick"  style="display:none">
+	<source src="sounds/buttonClick.mp3" type='audio/mp3'>
+  </audio>
+  <audio id="select"  style="display:none">
+	<source src="sounds/click.mp3" type='audio/mp3'>
+  </audio>
+  <audio id="cancel"  style="display:none">
+  <source src="sounds/switch1.mp3" type='audio/mp3'>
+  </audio>
+  <audio id="getStart"  style="display:none">
+  <source src="sounds/launcher1.mp3" type='audio/mp3'>
+  </audio>
+  <div class="player">
+    <svg  class="showplayer" width="95%" height = "650" >
+
+    <rect id ="P1" onclick="SetPlayer(0)" x=2% y=5 width="300" height="600" stroke="green" stroke-width="5" fill="#" fill-opacity='0.5'></rect>
+    <rect id ="P2" onclick="SetPlayer(1)" x=27% y=5 width="300" height="600" stroke="green" stroke-width="5" fill="#" fill-opacity='0.5' ></rect>
+	  <rect id ="P3" onclick="SetPlayer(2)" x=52% y=5 width="300" height="600" stroke="green" stroke-width="5" fill="#" fill-opacity='0.5' ></rect>
+	  <rect id ="P4" onclick="SetPlayer(3)" x=77% y=5 width="300" height="600" stroke="green" stroke-width="5" fill="#" fill-opacity='0.5' ></rect>
+	  <img id ="P1Img" src="ready.jpg" style="position:absolute;left:5%;top:2%;display:none" width="295" height="595"  ></img>
+
+	  <img id ="P2Img" src="Ready2.jpg" style="position:absolute;left:28.5%;top:2%;display:none" width="295" height="595" ></img>
+
+	  <img id ="P3Img" src="Ready3.jpg" style="position:absolute;left:52%;top:2%;display:none" width="295" height="595" ></img>
+
+	  <img id ="P4Img" src="Ready4.jpg" style="position:absolute;left:75.5%;top:2%;display:none" width="295" height="595" ></img>
+  </div>
+  <div style="text-align:center;">
+      <div class='buttons' id="buttons">
+
+      </div>
+  </div>
+  <img id="QMark" class="ShowHint" src="Q-Mark.png" onclick="ShowHint(0)"></img>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="sweetalert/dist/sweetalert.min.js"></script>
+  <script type="text/javascript" src="Waiting-Room.js"></script>
+
+</body>
+
+</html>
